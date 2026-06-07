@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>From Zero to GIS Hero — 5-Hour QGIS Introduction Course</title>
+<style>
+  /* ── EDIT YOUR BRAND COLOURS HERE ───────────────────────────── */
+  :root {
+    --bg:        #0D0D0D;
+    --surface:   #111111;
+    --surface2:  #161616;
+    --border:    #2A2A2A;
+    --text:      #F0EDE4;
+    --muted:     #8A8880;
+    --faint:     #444444;
+
+    /* Module accent colours — change any of these */
+    --c1: #00C896;   /* Module 1 */
+    --c2: #4A90D9;   /* Module 2 */
+    --c3: #F5A623;   /* Module 3 */
+    --c4: #E84393;   /* Module 4 */
+    --c5: #9B59B6;   /* Module 5 */
+  }
+  /* ─────────────────────────────────────────────────────────────── */
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: Georgia, 'Times New Roman', serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  /* HEADER */
+  header {
+    padding: 56px 24px 48px;
+    text-align: center;
+    background: radial-gradient(ellipse at 30% 50%, rgba(0,200,150,.07) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 50%, rgba(74,144,217,.07) 0%, transparent 60%),
+                #0D0D0D;
+    border-bottom: 1px solid var(--border);
+  }
+  .eyebrow {
+    font-size: 11px; letter-spacing: 4px; text-transform: uppercase;
+    color: var(--c1); margin-bottom: 16px;
+  }
+  h1 {
+    font-size: clamp(28px, 5vw, 58px); font-weight: normal;
+    font-style: italic; letter-spacing: -1px; line-height: 1.1;
+    margin-bottom: 10px;
+  }
+  .subtitle {
+    font-size: clamp(13px, 2vw, 17px); color: var(--muted);
+    letter-spacing: 1px; margin-bottom: 24px;
+  }
+  .tagline {
+    display: inline-block;
+    background: rgba(0,200,150,.1);
+    border: 1px solid rgba(0,200,150,.3);
+    border-radius: 4px; padding: 8px 20px;
+    font-size: 12px; color: var(--c1);
+    letter-spacing: 2px; text-transform: uppercase;
+    margin-bottom: 32px;
+  }
+  .pills { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+  .pill {
+    display: flex; align-items: center; gap: 6px;
+    background: rgba(255,255,255,.04);
+    border-radius: 20px; padding: 6px 14px;
+    font-size: 12px; cursor: pointer;
+    transition: opacity .2s;
+    text-decoration: none;
+  }
+  .pill:hover { opacity: .75; }
+
+  /* MAIN */
+  main { max-width: 860px; margin: 0 auto; padding: 32px 16px 64px; }
+
+  /* ACCORDION */
+  .module { margin-bottom: 14px; }
+
+  .mod-header {
+    display: flex; align-items: center; gap: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px; padding: 18px 22px;
+    cursor: pointer; transition: border-color .25s, border-radius .15s;
+    border-left-width: 4px;
+  }
+  .mod-header.open { border-radius: 12px 12px 0 0; }
+
+  .mod-icon {
+    width: 44px; height: 44px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; flex-shrink: 0;
+  }
+  .mod-meta { flex: 1; }
+  .mod-labels { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 4px; }
+  .mod-label { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; }
+  .mod-theme { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--faint); }
+  .mod-title { font-size: 17px; font-style: italic; }
+  .mod-toggle { font-size: 22px; transition: transform .3s; }
+  .mod-toggle.open { transform: rotate(45deg); }
+
+  .mod-body {
+    background: #0F0F0F;
+    border: 1px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 12px 12px;
+    overflow: hidden;
+    display: none;
+  }
+  .mod-body.open { display: block; }
+
+  .mod-hook {
+    padding: 18px 22px;
+    border-bottom: 1px solid #1E1E1E;
+    font-style: italic; color: #C8C4B4; font-size: 14px;
+  }
+
+  /* TABS */
+  .tabs { display: flex; border-bottom: 1px solid #1E1E1E; }
+  .tab-btn {
+    background: transparent; border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--faint); padding: 11px 18px;
+    cursor: pointer; font-size: 11px;
+    letter-spacing: 2px; text-transform: uppercase;
+    font-family: inherit; transition: all .2s;
+  }
+  .tab-btn.active { border-bottom-color: currentColor; }
+
+  .tab-panel { padding: 22px; display: none; }
+  .tab-panel.active { display: block; }
+
+  /* TOPIC CARD */
+  .topic-card {
+    display: flex; gap: 14px; padding: 14px;
+    background: var(--surface2); border-radius: 8px;
+    border: 1px solid #222; margin-bottom: 12px;
+  }
+  .topic-num {
+    width: 26px; height: 26px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; flex-shrink: 0; font-family: monospace;
+  }
+  .topic-name { font-size: 14px; font-weight: bold; margin-bottom: 5px; }
+  .topic-detail { font-size: 13px; color: var(--muted); }
+
+  /* OUTCOME */
+  .outcome {
+    display: flex; gap: 12px; align-items: flex-start;
+    padding: 11px 14px; background: var(--surface2);
+    border-radius: 8px; margin-bottom: 8px; font-size: 13px;
+    color: #C8C4B4;
+  }
+  .outcome-dot { font-size: 14px; margin-top: 1px; }
+
+  /* EXERCISE */
+  .exercise-box {
+    border-radius: 10px; padding: 18px; margin-bottom: 14px;
+  }
+  .exercise-label {
+    font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .exercise-text { font-size: 14px; color: #E0DDD4; line-height: 1.7; }
+  .data-box {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px;
+  }
+  .data-label {
+    font-size: 10px; color: #555; letter-spacing: 2px;
+    text-transform: uppercase; margin-bottom: 6px;
+  }
+  .data-text { font-size: 12px; color: #7A7870; }
+
+  /* BONUS */
+  .bonus {
+    margin-top: 40px;
+    background: linear-gradient(135deg, #1A0D2E, #0D1A1A);
+    border: 1px solid #4A2D6A;
+    border-radius: 16px; padding: 30px;
+  }
+  .bonus-eyebrow {
+    font-size: 11px; color: var(--c5); letter-spacing: 3px;
+    text-transform: uppercase; margin-bottom: 8px;
+  }
+  .bonus h2 {
+    font-style: italic; font-weight: normal; font-size: 22px;
+    margin-bottom: 22px; color: var(--text);
+  }
+  .bonus-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 12px;
+  }
+  .bonus-card {
+    display: flex; gap: 12px; align-items: flex-start;
+    background: rgba(255,255,255,.03);
+    border: 1px solid #2A1A3A;
+    border-radius: 8px; padding: 13px;
+    font-size: 13px; color: #B8B4A4; line-height: 1.6;
+  }
+  .bonus-icon { font-size: 18px; flex-shrink: 0; }
+
+  footer {
+    text-align: center; padding: 32px 16px;
+    font-size: 12px; color: var(--faint);
+    letter-spacing: 2px; text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════
+     EDIT ZONE: Course header text
+     ════════════════════════════════════════════ -->
+<header>
+  <div class="eyebrow">5-Hour Professional Course</div>
+  <h1>From Zero to GIS Hero</h1>
+  <div class="subtitle">A Practical Introduction to QGIS</div>
+  <div class="tagline">Real-world spatial thinking. Zero fluff. Instantly applicable.</div>
+
+  <div class="pills">
+    <a class="pill" href="#mod1" style="border:1px solid rgba(0,200,150,.35);color:var(--c1)">🌍 45 min · Module 1</a>
+    <a class="pill" href="#mod2" style="border:1px solid rgba(74,144,217,.35);color:var(--c2)">📂 60 min · Module 2</a>
+    <a class="pill" href="#mod3" style="border:1px solid rgba(245,166,35,.35);color:var(--c3)">🎨 75 min · Module 3</a>
+    <a class="pill" href="#mod4" style="border:1px solid rgba(232,67,147,.35);color:var(--c4)">⚙️ 75 min · Module 4</a>
+    <a class="pill" href="#mod5" style="border:1px solid rgba(155,89,182,.35);color:var(--c5)">🚀 45 min · Module 5</a>
+  </div>
+</header>
+
+<main>
+
+<!-- ═══════════════════════════════════════════════════════════
+     MODULE 1
+     To edit: change title, hook, outcomes, topics, exercise text
+     ══════════════════════════════════════════════════════════ -->
+<div class="module" id="mod1">
+  <div class="mod-header" style="border-color:var(--c1);border-left-color:var(--c1)" onclick="toggle(this)">
+    <div class="mod-icon" style="background:rgba(0,200,150,.12);border:2px solid rgba(0,200,150,.4)">🌍</div>
+    <div class="mod-meta">
+      <div class="mod-labels">
+        <span class="mod-label" style="color:var(--c1)">Module 1 · 45 min</span>
+        <span class="mod-theme">Context &amp; Mindset</span>
+      </div>
+      <div class="mod-title">Why Spatial Thinking Changes Everything</div>
+    </div>
+    <div class="mod-toggle" style="color:var(--c1)">+</div>
+  </div>
+
+  <div class="mod-body">
+    <div class="mod-hook">💡 Most GIS courses open the software on minute one. This one starts with the question that matters: why does location data give you an insight advantage — and what does that mean for your career or business?</div>
+
+    <div class="tabs">
+      <button class="tab-btn active" style="color:var(--c1)" onclick="switchTab(this,'topics1')">📚 Topics</button>
+      <button class="tab-btn" onclick="switchTab(this,'outcomes1')">✅ Outcomes</button>
+      <button class="tab-btn" onclick="switchTab(this,'exercise1')">🛠 Exercise</button>
+    </div>
+
+    <div id="topics1" class="tab-panel active">
+      <div class="topic-card">
+        <div class="topic-num" style="background:rgba(0,200,150,.15);border:1px solid rgba(0,200,150,.4);color:var(--c1)">1</div>
+        <div><div class="topic-name">The Spatial Advantage</div>
+        <div class="topic-detail">Why the majority of business data has a location component that most people ignore. Show real examples: flood risk planning, retail site selection, disease outbreak mapping, environmental monitoring. Location context turns raw data into decisions.</div></div>
+      </div>
+      <div class="topic-card">
+        <div class="topic-num" style="background:rgba(0,200,150,.15);border:1px solid rgba(0,200,150,.4);color:var(--c1)">2</div>
+        <div><div class="topic-name">Installing &amp; Configuring QGIS</div>
+        <div class="topic-detail">Download from qgis.org (free, open-source, cross-platform). Long-term release vs latest version — which to choose. First-time settings: dark theme, autosave interval, projection defaults. Install the two essential starter plugins: QuickMapServices and QuickOSM.</div></div>
+      </div>
+      <div class="topic-card">
+        <div class="topic-num" style="background:rgba(0,200,150,.15);border:1px solid rgba(0,200,150,.4);color:var(--c1)">3</div>
+        <div><div class="topic-name">The QGIS Interface — Every Panel Explained</div>
+        <div class="topic-detail">Layers panel, Map Canvas, Browser panel, Status bar, Toolbars. What each does and when you use it. How to dock, undock, and reset panels. Saving your workspace as a .QGZ project file. Understanding what a project file does — and doesn't — save.</div></div>
+      </div>
+      <div class="topic-card">
+        <div class="topic-num" style="background:rgba(0,200,150,.15);border:1px solid rgba(0,200,150,.4);color:var(--c1)">4</div>
+        <div><div class="topic-name">Coordinate Reference Systems — Demystified</div>
+        <div class="topic-detail">The crumpled-orange-peel explanation of why all flat maps distort reality. Geographic CRS (WGS84 / EPSG:4326) vs Projected CRS. How to check the CRS of a layer. How to set the project CRS. On-the-fly reprojection. Why mismatched CRS is the #1 beginner mistake.</div></div>
+      </div>
+    </div>
+
+    <div id="outcomes1" class="tab-panel">
+      <div class="outcome"><span class="outcome-dot" style="color:var(--c1)">◆</span>Explain why spatial thinking creates competitive insight across industries</div>
+      <div class="outcome"><span class="outcome-dot" style="color:var(--c1)">◆</span>Install and correctly configure QGIS from scratch</div>
+      <div class="outcome"><span class="outcome-dot" style="color:var(--c1)">◆</span>Navigate all major QGIS interface panels with confidence</div>
+      <div class="outcome"><span class="outcome-dot" style="color:var(--c1)">◆</span>Understand and set Coordinate Reference Systems correctly</div>
+      <div class="outcome"><span class="outcome-dot" style="color:var(--c1)">◆</span>Load your first data layer and save a working project file</div>
+    </div>
+
+    <div id="exercise1" class="tab-panel">
+      <div class="exercise-box" style="background:linear-gradient(135deg,rgba(0,200,150,.08),var(--surface2));border:1px solid rgba(0,200,150,.3)">
+        <div class="exercise-label" style="color:var(--c1)">Hands-On Exercise</div>
+        <div class="exercise-text">Add a basemap from OpenStreetMap using QuickMapServices. Create a CSV spreadsheet of 10 real locations meaningful to you (cafes, offices, parks). Load it into QGIS using Add Delimited Text Layer. Change each point's symbology to a coloured circle. Save your project. Navigate: zoom, pan, identify features.</div>
+      </div>
+      <div class="data-box">
+        <div class="data-label">Free Resources</div>
+        <div class="data-text">qgis.org (download) · QuickMapServices plugin (basemaps) · Any spreadsheet app to create your CSV</div>
+      </div>
+    </div>
+  </div>
+</div><!-- /module 1 -->
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     MODULE 2
+     ══════════════════════════════════════════════════════════ -->
+<div class="module" id="mod2">
+  <div class="mod-header" style="border-color:var(--c2);border-left-color:var(--c2)" onclick="toggle(this)">
+    <div class="mod-icon" style="background:rgba(74,144,217,.12);border:2px solid rgba(74,144,217,.4)">📂</div>
+    <div class="mod-meta">
+      <div class="mod-labels">
+        <span class="mod-label" style="color:var(--c2)">Module 2 · 60 min</span>
+        <span class="mod-theme">Spatial Data Literacy</span>
+      </div>
+      <div class="mod-title">Data: Finding It, Reading It, Trusting It</div>
+    </div>
+    <div class="mod-toggle" style="color:var(--c2)">+</div>
+  </div>
+
+  <div class="mod-body">
+    <div class="mod-hook">💡 Bad data in = bad maps out. This module turns students into ruthless spatial data critics — able to source, assess, and join data from anywhere in the world.</div>
+
+    <div class="tabs">
+      <button class="tab-btn active" style="color:var(--c2)" onclick="switchTab(this,'topics2')">📚 Topics</button>
+      <button class="tab-btn" onclick="switchTab(this,'outcomes2')">✅ Outcomes</button>
+      <button class="tab-btn" onclick="switchTab(this,'exercise2')">🛠 Exercise</button>
+    </div>
+
+    <div id="topics2" class="tab-panel active">
+      <div class="topic-card">
+        <div class="topic-num" style="background:rgba(74,144,217,.15);border:1px solid rgba(74,144,217,.4);color:var(--c2)">1</div>
+        <div><div class="topic-name">Vector vs Raster — The Core Mental Model</div>
+        <div class="topic-detail">Points, lines and polygons (vector) vs pixel grids (raster). When each data type is appropriate and why. Key file formats: Shapefile (.shp), GeoPackage (.gpkg), GeoJSON (.geojson), CSV with coordinates, GeoTIFF (.tif). GeoPackage as the modern preferred format and why it replaces Shapefiles.</div></div>
+      </div>
+      <div class="topic-card">
+        <div class="topic-num" style="background:rgba(74,144,217,.15);border:1px solid rgba(74,144,217,.4);color:var(--c2)">2</div>
+        <div><div class="topic-name">The Free Global Data Ecosystem</div>
+        <div class="topic-detail">Live walkthrough of six authoritative free sources: GADM for administrative boundaries, Natural Earth for global datasets, WorldPop for population grids, OpenStreetMap via QuickOSM plugin for streets and POIs, Copernicus Open Access Hub for satellite imagery, USGS EarthExplorer for elevation (SRTM). Build a reusable personal data library on your hard drive.</div></div>
+      </div>
+      <div class="topic-card">
+        <div class="topic-num" style="background:rgba(74,144,217,.15);border:1px solid rgba(74,144,217,.4);color:var(--c2)">3</div>
+        <div><div class="topic-name">Attribute Table Mastery</div>
+        <div class="topic-detail">Opening, sorting, filtering the attribute table. The Field Calculator: create new columns, calculate area, length, and perimeter in real-world units. Write basic expressions. Select features by attribute. Fix messy field names. Understand data types: string, integer, double, date.</div></div>
+      </div>
+      <div class="topic-card">
+        <div class="topic-num" style="background:rgba(74,144,217,.15);border:1px solid rgba(74,144,217,.4);color:var(--c2)">4</div>
+        <div><div class="topic-name">Table Joins — Connecting the Dots</div>
+        <div class="topic-detail">Join a non-spatial spreadsheet (CSV) to a polygon layer using a common field. One-to-one vs one-to-many joins. Common failure points: mismatched field types, extra spaces in values, encoding issues. How to make the join permanent by exporting. A joined dataset is the foundation of almost every choropleth map.</div></div>
+      </div>
+    </div>
+
+    <div id="outcomes2" class="tab-panel">
+      <div class="outcome"><span class="outcome-dot" style="color:var(--c2)">◆</span>Distinguish and work with vector and raster data types and their file formats</div>
+      <div class="outcome"><span class="outcome-dot" style="color:var(--c2)">◆</span>Source free authoritative spatial data for any country or region</div>
+      <div class="outcome"><span class="outcome-dot" style="color:var(--c2)">◆</span>Inspect, filter, and edit attribute tables with confidence</div>
+      <div class="outcome"><span class="outcome-dot" style="color:var(--c2)">◆</span>Calculate new fields using the QGIS Field Calculator</div>
+      <div class="outcome"><span class="outcome-dot" style="color:var(--c2)">◆</span>Join external tabular data to a spatial layer and diagnose common errors</div>
+    </div>
+
+    <div id="exercise2" class="tab-panel">
+      <div class="exercise-box" style="background:linear-gradient(135deg,rgba(74,144,217,.08),var(--surface2));border:1px solid rgba(74,144,217,.3)">
+        <div class="exercise-label" style="color:var(--c2)">Hands-On Exercise</div>
+        <div class="exercise-text">Download country boundaries from GADM and a CSV of World Bank GDP per capita statistics. Join them using the country code field. Calculate a new column showing GDP per capita rounded to the nearest thousand. Classify countries into four income groups and export the result as a GeoPackage. Inspect which join rows failed and why.</div>
+      </div>
+      <div class="data-box">
+        <div class="data-label">Free Data Sources</div>
+        <div class="data-text">gadm.org · data.worldbank.org · naturalearthdata.com · QuickOSM plugin (built into QGIS)</div>
+      </div>
+    </div>
+  </div>
+</div><!-- /module 2 -->
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     MODULE 3
+     ══════════════════════════════════════════════════════════ -->
+<div class="module" id="mod3">
+  <div class="mod-header" style="border-color:var(--c3);border-left-color:var(--c3)" onclick="toggle(this)">
+    <div class="mod-icon" style="background:rgba(245,166,35,.12);border:2px solid rgba(245,166,35,.4)">🎨</div>
+    <div class="mod-meta">
+      <div class="mod-labels">
+        <span class="mod-label" style="color:var(--c3)">Module 3 · 75 min</span>
+        <span class="mod-theme">Visualisation &amp; Symbology</span>
+      </div>
+      <div class="mod-title">Cartography That Communicates</div>
+    </div>
+    <div class="mod-toggle" style="color:var(--c3)">+</div>
+  </div>
+
+  <div class="mod-body">
+    <div class="mod-hook">💡 Anyone can put data on a map. The skill is designing a map that communicates clearly, quickly, and honestly. This module is a practical design education built on cartographic principles used by national mapping agencies.</div>
+
+    <div class="tabs">
+      <button class="tab-btn active" style="color:var(--c3)" onclick="switchTab(this,'topics3')">📚 Topics</button>
+      <button class="tab-btn" onclick="switchTab(this,'outcomes3')">✅ Outcomes</button>
+      <button class="tab-btn" onclick="switchTab(this,'exercise3')">🛠 Exercise</button>
+    </div>
+
+    <div id="topics3" class="tab-panel active">
+      <div class="topic-card">
+        <div class="topic-num" style="background:rgba(245,166,35,.15);border:1px solid rgba(245,166,35,.4);color:var(--c3)">1</div>
+        <div><div class="topic-name">Five Cartographic Principles Every Map Needs</div>
+        <div class="topic-detail">Visual hierarchy (what the eye reads first), figure-ground contrast, colour theory for data (sequential, diverging, qualitative schemes), text placement rules, and the discipline of knowing what to leave out. Analyse three real published maps — what works, what misleads, and why.</div></div>
+      </div>
+      <div class="topic-card">
+        <div class="topic-num" style="background:rgba(245,166,35,.15);border:1px solid rgba(245,166,35,.4);color:var(--c3)">2</div>
+        <div><div class="topic-name">QGIS Symbology — Every Mode Explained</div>
+        <div class="topic-detail">Single symbol, Categorised, Graduated, Rule-based, Heatmap, and 2.5D renderer. When each is appropriate. Colour ramp selection using ColorBrewer principles. Accessible palette choices for colour-blind readers. Transparency, blending modes, and layer effects for polished output.</div></div>
+      </div>
+      <div class="topic-card">
+        <div class="topic-num" style="background:rgba(245,166,35,.15);border:1px solid rgba(245,166,35,.4);color:var(--c3)">3</div>
+        <div><div class="topic-name">Labels That Work</div>
+        <div class="topic-detail">Label expressions using the QGIS expression engine. Placement modes: around point, on line, inside polygon. Priority and obstacle settings. Label callouts and connectors. When to use labels vs tooltips vs a legend. The PAL labeling engine's automatic conflict resolution.</div></div>
+      </div>
+      <div class="topic-card">
+        <div class="topic-num" style="background:rgba(245,166,35,.15);border:1px solid rgba(245,166,35,.4);color:var(--c3)">4</div>
+        <div><div class="topic-name">Print Layout — Your Professional Deliverable</div>
+        <div class="topic-detail">The QGIS Print Layout Manager. Adding and configuring map frames. Legends: what to include, what to exclude, how to reorder and rename items. Scale bars, north arrows, graticules. Adding your logo, title, data source credit, and projection note. Export settings: PNG at 300dpi for print, SVG for editing, PDF for sharing.</div></div>
+      </div>
+    </div>
+
+    <div id="outcomes3" class="tab-panel">
+      <div class="outcome"><span class="outcome-dot" style="color:var(--c3)">◆</span>Apply the five core cartographic principles to any map</div>
+      <div class="outcome"><span class="outcome-dot" style="color:var(--c3)">◆</span>Configure all QGIS symbology modes and choose the right one for each dataset</div>
+      <div class="outcome"><span class="outcome-dot" style="color:var(--c3)">◆</span>Select accessible, perceptually correct colour palettes</div>
+      <div class="outcome"><span class="outcome-dot" style="color:var(--c3)">◆</span>Create map labels using expressions and control their placement</div>
+      <div class="outcome"><span class="outcome-dot" style="color:var(--c3)">◆</span>Design and export a print-ready A4 map layout at publication quality</div>
+    </div>
+
+    <div id="exercise3" class="tab-panel">
+      <div class="exercise-box" style="background:linear-gradient(135deg,rgba(245,166,35,.08),var(--surface2));border:1px solid rgba(245,166,35,.3)">
+        <div class="exercise-label" style="color:var(--c3)">Hands-On Exercise</div>
+        <div class="exercise-text">Using the GDP dataset from Module 2, create a publication-quality choropleth map. Apply a sequential colour ramp with five graduated classes. Add country labels for the top 10 economies. Open Print Layout, add a title, legend, scale bar, north arrow, and data source credit. Export as a 300dpi PNG. Peer review: swap maps and critique using the five cartographic principles.</div>
+      </div>
+      <div class="data-box">
+        <div class="data-label">Free Resources</div>
+        <div class="data-text">colorbrewer2.org (colour palettes) · fonts.google.com (free typefaces for layout) · Dataset from Module 2</div>
+      </div>
+    </div>
+  </div>
+</div><!-- /module 3 -->
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     MODULE 4
+     ══════════════════════════════════════════════════════════ -->
+<div class="module" id="mod4">
+  <div class="mod-header" style="border-color:var(--c4);border-left-color:var(--c4)" onclick="toggle(this)">
+    <div class="mod-icon" style="background:rgba(232,67,147,.12);border:2px solid rgba(232,67,147,.4)">⚙️</div>
+    <div class="mod-meta">
+      <div class="mod-labels">
+        <span class="mod-label" style="color:var(--c4)">Module 4 · 75 min</span>
+        <span class="mod-theme">Geoprocessing &amp; Analysis</span>
+      </div>
+      <div class="mod-title">Spatial Analysis: Answering the "Where?" Question</div>
+    </div>
+    <div class="mod-toggle" style="color:var(--c4)">+</div>
+  </div>
+
+  <div class="mod-body">
+    <div class="mod-hook">💡 This is the module where QGIS stops being a map-making tool and becomes a decision-making tool. Every operation here maps directly to a real question an organisation needs answered.</div>
+
+    <div class="tabs">
+      <button class="tab-btn active" style="color:var(--c4)" onclick="switchTab(this,'topics4')">📚 Topics</button>
+      <button class="tab-btn" onclick="switchTab(this,'outcomes4')">✅ Outcomes</button>
+      <button class="tab-btn" onclick="switchTab(this,'exercise4')">🛠 Exercise</button>
+    </div>
+
+    <div id="topics4" class="tab-panel active">
+      <div class="topic-card">
+        <div class="topic-num" style="background:rgba(232,67,147,.15);border:1px solid rgba(232,67,147,.4);color:var(--c4)">1</div>
+        <div><div class="topic-name">The Core Geoprocessing Operations</div>
+        <div class="topic-detail">Buffer: how far is X from Y? Clip: cut a dataset to a study area. Intersect: what features overlap? Union: merge two datasets. Dissolve: merge features by attribute. Difference: what's left after removing an area? Each explained with a practical scenario. Run them all via Vector menu and via the Processing Toolbox.</div></div>
+      </div>
+      <div class="topic-card">
+        <div class="topic-num" style="background:rgba(232,67,147,.15);border:1px solid rgba(232,67,147,.4);color:var(--c4)">2</div>
+        <div><div class="topic-name">Spatial Queries and Selections</div>
+        <div class="topic-detail">Select by Location: find features that intersect, are within, touch, or are nearest to another layer. Distance Matrix: calculate distances between point pairs. Count Points in Polygons: how many incidents per district? Join Attributes by Nearest: tag each point with data from the closest polygon. These four operations answer 80% of common GIS questions.</div></div>
+      </div>
+      <div class="topic-card">
+        <div class="topic-num" style="background:rgba(232,67,147,.15);border:1px solid rgba(232,67,147,.4);color:var(--c4)">3</div>
+        <div><div class="topic-name">Raster Analysis &amp; the Raster Calculator</div>
+        <div class="topic-detail">Working with elevation data: hillshade, slope, aspect. The Raster Calculator for arithmetic and conditional operations on raster grids. Reclassify by table to convert continuous data into discrete categories. Extract raster values to points. Understand spatial resolution and its implications for analysis accuracy.</div></div>
+      </div>
+      <div class="topic-card">
+        <div class="topic-num" style="background:rgba(232,67,147,.15);border:1px solid rgba(232,67,147,.4);color:var(--c4)">4</div>
+        <div><div class="topic-name">The QGIS Graphical Modeler</div>
+        <div class="topic-detail">Build a reusable, documented, repeatable analysis workflow visually — no coding required. Chain multiple geoprocessing steps. Add input parameters so others can run the model with their own data. Export as a standalone QGIS model file. Introduction to why this matters for reproducible analysis and client reporting.</div></div>
+      </div>
+    </div>
+
+    <div id="outcomes4" class="tab-panel">
+      <div class="outcome"><span class="outcome-dot" style="color:var(--c4)">◆</span>Execute the six essential geoprocessing operations and know when to use each</div>
+      <div class="outcome"><span class="outcome-dot" style="color:var(--c4)">◆</span>Run spatial queries to select, count, and tag features by location</div>
+      <div class="outcome"><span class="outcome-dot" style="color:var(--c4)">◆</span>Perform basic raster analysis including hillshade, slope and raster calculator</div>
+      <div class="outcome"><span class="outcome-dot" style="color:var(--c4)">◆</span>Build a reusable multi-step analysis model in the QGIS Graphical Modeler</div>
+      <div class="outcome"><span class="outcome-dot" style="color:var(--c4)">◆</span>Translate a real-world location question into a documented QGIS workflow</div>
+    </div>
+
+    <div id="exercise4" class="tab-panel">
+      <div class="exercise-box" style="background:linear-gradient(135deg,rgba(232,67,147,.08),var(--surface2));border:1px solid rgba(232,67,147,.3)">
+        <div class="exercise-label" style="color:var(--c4)">Hands-On Exercise</div>
+        <div class="exercise-text">Site suitability analysis — find the best locations for a new community health clinic. Criteria: (1) more than 2km from existing clinics (buffer + difference), (2) high population density areas (raster classify), (3) within 500m of a main road (buffer + intersect), (4) within high-deprivation census areas (select by attribute + clip). Combine all criteria layers. Identify the top 3 candidate zones. Build the workflow in the Graphical Modeler so it can be rerun for any city.</div>
+      </div>
+      <div class="data-box">
+        <div class="data-label">Free Data Sources</div>
+        <div class="data-text">OpenStreetMap roads &amp; POIs via QuickOSM plugin · WorldPop population raster · Your country's census open data portal · GADM for admin boundaries</div>
+      </div>
+    </div>
+  </div>
+</div><!-- /module 4 -->
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     MODULE 5
+     ══════════════════════════════════════════════════════════ -->
+<div class="module" id="mod5">
+  <div class="mod-header" style="border-color:var(--c5);border-left-color:var(--c5)" onclick="toggle(this)">
+    <div class="mod-icon" style="background:rgba(155,89,182,.12);border:2px solid rgba(155,89,182,.4)">🚀</div>
+    <div class="mod-meta">
+      <div class="mod-labels">
+        <span class="mod-label" style="color:var(--c5)">Module 5 · 45 min</span>
+        <span class="mod-theme">Output, Portfolio &amp; Next Steps</span>
+      </div>
+      <div class="mod-title">Share Your Work &amp; Keep Growing</div>
+    </div>
+    <div class="mod-toggle" style="color:var(--c5)">+</div>
+  </div>
+
+  <div class="mod-body">
+    <div class="mod-hook">💡 A map that only lives on your hard drive earns you nothing. This module publishes your work to the web, frames it as a portfolio piece, and maps out the exact skills that come next.</div>
+
+    <div class="tabs">
+      <button class="tab-btn active" style="color:var(--c5)" onclick="switchTab(this,'topics5')">📚 Topics</button>
+      <button class="tab-btn" onclick="switchTab(this,'outcomes5')">✅ Outcomes</button>
+      <button class="tab-btn" onclick="switchTab(this,'exercise5')">🛠 Exercise</button>
+    </div>
+
+    <div id="topics5" class="tab-panel active">
+      <div class="topic-card">
+        <div class="topic-num" style="background:rgba(155,89,182,.15);border:1px solid rgba(155,89,182,.4);color:var(--c5)">1</div>
+        <div><div class="topic-name">Publishing Interactive Maps for Free</div>
+        <div class="topic-detail">Three zero-cost options: (1) qgis2web plugin — generates a standalone Leaflet or OpenLayers HTML file you host anywhere; (2) QGIS Cloud free tier — publish directly from QGIS; (3) Felt.com free tier — drag-and-drop GeoJSON upload with shareable link. When to use each. How to embed an interactive map iframe into a website or blog post.</div></div>
+      </div>
+      <div class="topic-card">
+        <div class="topic-num" style="background:rgba(155,89,182,.15);border:1px solid rgba(155,89,182,.4);color:var(--c5)">2</div>
+        <div><div class="topic-name">Live Data Connections in QGIS</div>
+        <div class="topic-detail">Connecting to WMS (Web Map Service) and WFS (Web Feature Service) live data feeds — data that updates automatically. Adding national mapping agency WMS feeds. OGC services: what they are and where to find them. QGIS as a client to PostGIS spatial databases. Introduction to SpatiaLite for local database storage.</div></div>
+      </div>
+      <div class="topic-card">
+        <div class="topic-num" style="background:rgba(155,89,182,.15);border:1px solid rgba(155,89,182,.4);color:var(--c5)">3</div>
+        <div><div class="topic-name">Building a GIS Portfolio That Gets Noticed</div>
+        <div class="topic-detail">The three project types that demonstrate real capability: a choropleth story map, a site suitability analysis, and a live data dashboard. How to write a project description (problem → method → result → insight). GitHub for version control and hosting HTML maps on GitHub Pages. LinkedIn positioning: how to describe QGIS skills clearly without jargon.</div></div>
+      </div>
+      <div class="topic-card">
+        <div class="topic-num" style="background:rgba(155,89,182,.15);border:1px solid rgba(155,89,182,.4);color:var(--c5)">4</div>
+        <div><div class="topic-name">The QGIS Ecosystem &amp; Your Learning Path</div>
+        <div class="topic-detail">Essential plugins beyond the basics: MMQGIS (geocoding, joins), Semi-Automatic Classification Plugin (satellite image analysis), OpenLayers, Profile Tool. Community resources: GIS Stack Exchange, r/gis, QGIS mailing list, local QGIS user groups. Certificates worth pursuing: QGIS certifications, open university spatial courses. The honest next-skills roadmap: Python for QGIS (PyQGIS), PostGIS, remote sensing.</div></div>
+      </div>
+    </div>
+
+    <div id="outcomes5" class="tab-panel">
+      <div class="outcome"><span class="outcome-dot" style="color:var(--c5)">◆</span>Publish an interactive web map using at least two free methods</div>
+      <div class="outcome"><span class="outcome-dot" style="color:var(--c5)">◆</span>Connect QGIS to live WMS and WFS data services</div>
+      <div class="outcome"><span class="outcome-dot" style="color:var(--c5)">◆</span>Describe and present your GIS work clearly to a non-technical audience</div>
+      <div class="outcome"><span class="outcome-dot" style="color:var(--c5)">◆</span>Identify five essential QGIS community resources to support continued learning</div>
+      <div class="outcome"><span class="outcome-dot" style="color:var(--c5)">◆</span>Know the exact skills that build on this course and how to access them</div>
+    </div>
+
+    <div id="exercise5" class="tab-panel">
+      <div class="exercise-box" style="background:linear-gradient(135deg,rgba(155,89,182,.08),var(--surface2));border:1px solid rgba(155,89,182,.3)">
+        <div class="exercise-label" style="color:var(--c5)">Hands-On Exercise</div>
+        <div class="exercise-text">Export your Module 3 choropleth map as an interactive web map using qgis2web. Upload it to GitHub Pages or link via Felt. Write a 100-word portfolio project description: one sentence on the problem, two on your method, one on the result, one on the insight it reveals. Share the live link with the group. Final reflection: write down the one real-world spatial question in your own work or sector that you now know how to start answering.</div>
+      </div>
+      <div class="data-box">
+        <div class="data-label">Free Publishing Tools</div>
+        <div class="data-text">qgis2web plugin · github.com (free hosting via GitHub Pages) · felt.com (free tier) · qgiscloud.com (free tier)</div>
+      </div>
+    </div>
+  </div>
+</div><!-- /module 5 -->
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     BONUS / BUSINESS SECTION
+     Edit the tip text below to reflect your consulting offer
+     ══════════════════════════════════════════════════════════ -->
+<div class="bonus">
+  <div class="bonus-eyebrow">For Course Instructors</div>
+  <h2>Turning This Course Into Consulting Leads</h2>
+  <div class="bonus-grid">
+    <div class="bonus-card"><span class="bonus-icon">📹</span>Record each module as a standalone YouTube video. Titles like "QGIS Site Suitability Analysis — Step by Step" rank strongly in organic search and drive inbound traffic for months.</div>
+    <div class="bonus-card"><span class="bonus-icon">💼</span>Use the Module 4 health clinic exercise as a live case study in consulting proposals — it shows methodology and reasoning, not just software familiarity.</div>
+    <div class="bonus-card"><span class="bonus-icon">🎓</span>Publish on Udemy or Teachable (both free to list). Price at £29–£49. Even modest enrolments build passive income and a warm audience pipeline.</div>
+    <div class="bonus-card"><span class="bonus-icon">🔗</span>End every module with a soft CTA: "Need this analysis done for your organisation? Let's talk." Link to your booking page — no hard sell required.</div>
+    <div class="bonus-card"><span class="bonus-icon">🤝</span>Approach local councils, NGOs, universities, and environmental agencies. Offer the course at cost or free; position paid consulting as the natural next step.</div>
+    <div class="bonus-card"><span class="bonus-icon">📊</span>The suitability analysis workflow from Module 4 is a billable consulting deliverable. The course markets it — and pre-qualifies the clients who enquire.</div>
+  </div>
+</div>
+
+</main>
+
+<!-- ═══════════════════════════════════════════════════════════
+     FOOTER — edit contact / branding text here
+     ══════════════════════════════════════════════════════════ -->
+<footer>
+  <p>Your Name / Organisation · yourwebsite.com</p>
+</footer>
+
+<script>
+  // Accordion: open/close module body
+  function toggle(header) {
+    const body = header.nextElementSibling;
+    const plus = header.querySelector('.mod-toggle');
+    const isOpen = body.classList.contains('open');
+    // close all
+    document.querySelectorAll('.mod-body').forEach(b => b.classList.remove('open'));
+    document.querySelectorAll('.mod-header').forEach(h => { h.classList.remove('open'); h.querySelector('.mod-toggle').classList.remove('open'); });
+    if (!isOpen) {
+      body.classList.add('open');
+      header.classList.add('open');
+      plus.classList.add('open');
+    }
+  }
+
+  // Tabs: switch between Topics / Outcomes / Exercise
+  function switchTab(btn, panelId) {
+    const body = btn.closest('.mod-body');
+    body.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    body.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(panelId).classList.add('active');
+  }
+
+  // Smooth scroll for pill links
+  document.querySelectorAll('a.pill').forEach(link => {
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      const target = document.querySelector(link.getAttribute('href'));
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // auto-open that module
+        const header = target.querySelector('.mod-header');
+        if (header) toggle(header);
+      }
+    });
+  });
+</script>
+</body>
+</html>
